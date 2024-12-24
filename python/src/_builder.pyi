@@ -1,11 +1,11 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT license.
 
-from typing import BinaryIO, overload, Optional
+from typing import BinaryIO, Optional, overload
 
 import numpy as np
 
-from ._common import DistanceMetric, VectorDType, VectorLikeBatch, VectorIdentifierBatch
+from . import DistanceMetric, VectorDType, VectorIdentifierBatch, VectorLikeBatch
 
 def numpy_to_diskann_file(vectors: np.ndarray, file_handler: BinaryIO): ...
 @overload
@@ -21,7 +21,7 @@ def build_disk_index(
     pq_disk_bytes: int,
     vector_dtype: VectorDType,
     index_prefix: str,
-): ...
+) -> None: ...
 @overload
 def build_disk_index(
     data: VectorLikeBatch,
@@ -34,7 +34,7 @@ def build_disk_index(
     num_threads: int,
     pq_disk_bytes: int,
     index_prefix: str,
-): ...
+) -> None: ...
 @overload
 def build_memory_index(
     data: VectorLikeBatch,
@@ -47,12 +47,12 @@ def build_memory_index(
     use_pq_build: bool,
     num_pq_bytes: int,
     use_opq: bool,
-    label_file: str,
+    tags: Union[str, VectorIdentifierBatch],
+    filter_labels: Optional[list[list[str]]],
     universal_label: str,
     filter_complexity: int,
-    tags: Optional[VectorIdentifierBatch],
-    index_prefix: str,
-): ...
+    index_prefix: str
+) -> None: ...
 @overload
 def build_memory_index(
     data: str,
@@ -66,10 +66,9 @@ def build_memory_index(
     num_pq_bytes: int,
     use_opq: bool,
     vector_dtype: VectorDType,
-    label_file: str,
+    tags: Union[str, VectorIdentifierBatch],
+    filter_labels_file: Optional[list[list[str]]],
     universal_label: str,
     filter_complexity: int,
-    tags: Optional[str],
-    index_prefix: str,
-): ...
-
+    index_prefix: str
+) -> None: ...
