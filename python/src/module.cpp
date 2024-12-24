@@ -48,18 +48,19 @@ template <typename T> inline void add_variant(py::module_ &m, const Variant &var
 
     m.def(variant.memory_builder_name.c_str(), &diskannpy::build_memory_index<T>, "distance_metric"_a,
           "data_file_path"_a, "index_output_path"_a, "graph_degree"_a, "complexity"_a, "alpha"_a, "num_threads"_a,
-          "use_pq_build"_a, "num_pq_bytes"_a, "use_opq"_a, "filter_complexity"_a = 0, "use_tags"_a = false);
+          "use_pq_build"_a, "num_pq_bytes"_a, "use_opq"_a, "use_tags"_a = false, "filter_labels_file"_a = "",
+          "universal_label"_a = "", "filter_complexity"_a = 0);
 
     py::class_<diskannpy::StaticMemoryIndex<T>>(m, variant.static_memory_index_name.c_str())
         .def(py::init<const diskann::Metric, const std::string &, const size_t, const size_t, const uint32_t,
                       const uint32_t>(),
              "distance_metric"_a, "index_path"_a, "num_points"_a, "dimensions"_a, "num_threads"_a,
              "initial_search_complexity"_a)
-        .def("search", &diskannpy::StaticMemoryIndex<T>::search, "query"_a, "knn"_a, "complexity"_a, "ep_id"_a)
+        .def("search", &diskannpy::StaticMemoryIndex<T>::search, "query"_a, "knn"_a, "complexity"_a)
+        .def("search_with_filter", &diskannpy::StaticMemoryIndex<T>::search_with_filter, "query"_a, "knn"_a,
+             "complexity"_a, "filter"_a)
         .def("batch_search", &diskannpy::StaticMemoryIndex<T>::batch_search, "queries"_a, "num_queries"_a, "knn"_a,
-             "complexity"_a, "num_threads"_a, "ep_id"_a)
-        .def("batch_search_with_eps", &diskannpy::StaticMemoryIndex<T>::batch_search_with_eps, "queries"_a, "num_queries"_a, "knn"_a,
-             "complexity"_a, "num_threads"_a, "ep_ids"_a);
+             "complexity"_a, "num_threads"_a);
 
     py::class_<diskannpy::DynamicMemoryIndex<T>>(m, variant.dynamic_memory_index_name.c_str())
         .def(py::init<const diskann::Metric, const size_t, const size_t, const uint32_t, const uint32_t, const bool,
@@ -81,7 +82,8 @@ template <typename T> inline void add_variant(py::module_ &m, const Variant &var
         .def("save", &diskannpy::DynamicMemoryIndex<T>::save, "save_path"_a = "", "compact_before_save"_a = false)
         .def("insert", &diskannpy::DynamicMemoryIndex<T>::insert, "vector"_a, "id"_a)
         .def("mark_deleted", &diskannpy::DynamicMemoryIndex<T>::mark_deleted, "id"_a)
-        .def("consolidate_delete", &diskannpy::DynamicMemoryIndex<T>::consolidate_delete);
+        .def("consolidate_delete", &diskannpy::DynamicMemoryIndex<T>::consolidate_delete)
+        .def("num_points", &diskannpy::DynamicMemoryIndex<T>::num_points);
 
     py::class_<diskannpy::StaticDiskIndex<T>>(m, variant.static_disk_index_name.c_str())
         .def(py::init<const diskann::Metric, const std::string &, const uint32_t, const size_t, const uint32_t>(),

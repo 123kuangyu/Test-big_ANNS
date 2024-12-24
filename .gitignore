@@ -378,4 +378,3 @@ gperftools
 
 # Rust
 rust/target
-.venv/
